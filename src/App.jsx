@@ -43,7 +43,7 @@ const INDIAN_FOODS = [
   { name: "Roti", calories: 80, protein: 3, carbs: 15, fat: 1.5, unit: "piece" }
 ];
 
-const JUNK_FOODS2 = [
+const JUNK_FOODS = [
   { name: "Lays Chips (pack)", xp: 160, calories: 200, type: "chips" },
   { name: "Kurkure (pack)", xp: 176, calories: 220, type: "chips" },
   { name: "Maggi", xp: 320, calories: 400, type: "instant" },
@@ -722,135 +722,8 @@ function HabitsTracker({ todayData, setTodayData, userData, setUserData }) {
   );
 }
 
-import { useState } from 'react';
-import { Flame, ShoppingCart, X, Info } from 'lucide-react';
-
-const JUNK_FOODS = [
-  {
-    name: "Pizza Slice",
-    xp: 150,
-    calories: 285,
-    type: "Fast Food",
-    image: "🍕",
-    nutrition: {
-      protein: "12g",
-      carbs: "36g",
-      fat: "10g",
-      sugar: "3g",
-      sodium: "640mg",
-      description: "A classic cheese slice - delicious but high in sodium and refined carbs."
-    }
-  },
-  {
-    name: "Burger",
-    xp: 200,
-    calories: 354,
-    type: "Fast Food",
-    image: "🍔",
-    nutrition: {
-      protein: "25g",
-      carbs: "35g",
-      fat: "15g",
-      sugar: "7g",
-      sodium: "510mg",
-      description: "Beef patty with cheese and bun - good protein but high in saturated fat."
-    }
-  },
-  {
-    name: "French Fries",
-    xp: 120,
-    calories: 312,
-    type: "Fast Food",
-    image: "🍟",
-    nutrition: {
-      protein: "3g",
-      carbs: "41g",
-      fat: "15g",
-      sugar: "0g",
-      sodium: "210mg",
-      description: "Deep-fried potatoes - high in empty calories and trans fats."
-    }
-  },
-  {
-    name: "Ice Cream",
-    xp: 100,
-    calories: 207,
-    type: "Dessert",
-    image: "🍦",
-    nutrition: {
-      protein: "3g",
-      carbs: "24g",
-      fat: "11g",
-      sugar: "21g",
-      sodium: "80mg",
-      description: "Creamy vanilla ice cream - loaded with sugar and saturated fat."
-    }
-  },
-  {
-    name: "Donut",
-    xp: 80,
-    calories: 195,
-    type: "Dessert",
-    image: "🍩",
-    nutrition: {
-      protein: "2g",
-      carbs: "25g",
-      fat: "11g",
-      sugar: "13g",
-      sodium: "170mg",
-      description: "Glazed donut - pure sugar rush with minimal nutritional value."
-    }
-  },
-  {
-    name: "Soda",
-    xp: 60,
-    calories: 150,
-    type: "Drink",
-    image: "🥤",
-    nutrition: {
-      protein: "0g",
-      carbs: "39g",
-      fat: "0g",
-      sugar: "39g",
-      sodium: "45mg",
-      description: "Carbonated sugar water - empty calories with no nutritional benefits."
-    }
-  },
-  {
-    name: "Chocolate Bar",
-    xp: 90,
-    calories: 210,
-    type: "Snack",
-    image: "🍫",
-    nutrition: {
-      protein: "3g",
-      carbs: "26g",
-      fat: "13g",
-      sugar: "24g",
-      sodium: "35mg",
-      description: "Milk chocolate - high in sugar and saturated fats."
-    }
-  },
-  {
-    name: "Chips",
-    xp: 70,
-    calories: 152,
-    type: "Snack",
-    image: "🥔",
-    nutrition: {
-      protein: "2g",
-      carbs: "15g",
-      fat: "10g",
-      sugar: "0g",
-      sodium: "170mg",
-      description: "Potato chips - high in sodium and unhealthy fats."
-    }
-  }
-];
-
 function XPShop({ cart, setCart, userData, setUserData, purchaseHistory, setPurchaseHistory }) {
   const [view, setView] = useState('shop');
-  const [selectedItem, setSelectedItem] = useState(null);
 
   const addToCart = (item) => {
     const existing = cart.find(i => i.name === item.name);
@@ -905,80 +778,6 @@ function XPShop({ cart, setCart, userData, setUserData, purchaseHistory, setPurc
     alert(`Purchase complete! You spent ${totalXP} XP. That was ${Math.ceil(totalXP / 180)} days of workouts. Worth it?`);
   };
 
-  // Nutrition Info Modal
-  const NutritionModal = ({ item, onClose }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-zinc-800 rounded-xl max-w-md w-full border border-zinc-700">
-        <div className="flex items-center justify-between p-4 border-b border-zinc-700">
-          <h3 className="text-lg font-bold flex items-center gap-2">
-            {item.image} {item.name}
-          </h3>
-          <button onClick={onClose} className="text-zinc-400 hover:text-white">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-        
-        <div className="p-4">
-          <div className="text-center mb-4">
-            <div className="text-6xl mb-2">{item.image}</div>
-            <p className="text-zinc-400 text-sm">{item.type}</p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="bg-zinc-900 p-3 rounded-lg text-center">
-              <div className="text-2xl font-bold text-orange-400">{item.calories}</div>
-              <div className="text-xs text-zinc-400">Calories</div>
-            </div>
-            <div className="bg-zinc-900 p-3 rounded-lg text-center">
-              <div className="text-2xl font-bold text-purple-400">{item.xp} XP</div>
-              <div className="text-xs text-zinc-400">Cost</div>
-            </div>
-          </div>
-
-          <div className="bg-zinc-900 rounded-lg p-4 mb-4">
-            <h4 className="font-semibold mb-3 text-sm">Nutrition Facts</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-zinc-400">Protein</span>
-                <span>{item.nutrition.protein}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-400">Carbohydrates</span>
-                <span>{item.nutrition.carbs}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-400">Fat</span>
-                <span>{item.nutrition.fat}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-400">Sugar</span>
-                <span>{item.nutrition.sugar}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-zinc-400">Sodium</span>
-                <span>{item.nutrition.sodium}</span>
-              </div>
-            </div>
-          </div>
-
-          <p className="text-sm text-zinc-400 italic text-center">
-            {item.nutrition.description}
-          </p>
-
-          <button
-            onClick={() => {
-              addToCart(item);
-              onClose();
-            }}
-            className="w-full mt-4 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors"
-          >
-            Add to Cart - {item.xp} XP
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
   if (view === 'history') {
     return (
       <div className="p-4 space-y-4">
@@ -1013,9 +812,8 @@ function XPShop({ cart, setCart, userData, setUserData, purchaseHistory, setPurc
                   </div>
                   <div className="space-y-1">
                     {purchase.items.map((item, j) => (
-                      <div key={j} className="text-sm text-zinc-300 flex items-center gap-2">
-                        <span>{item.image}</span>
-                        <span>{item.name} ×{item.quantity}</span>
+                      <div key={j} className="text-sm text-zinc-300">
+                        {item.name} ×{item.quantity}
                       </div>
                     ))}
                   </div>
@@ -1030,8 +828,6 @@ function XPShop({ cart, setCart, userData, setUserData, purchaseHistory, setPurc
 
   return (
     <div className="p-4 space-y-4">
-      {selectedItem && <NutritionModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
-      
       <div className="flex gap-2">
         <button
           onClick={() => setView('shop')}
@@ -1048,53 +844,33 @@ function XPShop({ cart, setCart, userData, setUserData, purchaseHistory, setPurc
       </div>
 
       {/* Balance Display */}
-      <div className="bg-gradient-to-r from-purple-900 to-purple-800 rounded-xl p-4 border border-purple-700">
+      <div className="bg-gradient-to-r from-purple-900 to-purple-800 rounded-lg p-4 border border-purple-700">
         <div className="text-sm text-purple-200 mb-1">Your Balance</div>
         <div className="text-3xl font-bold">{userData.currentXP} XP</div>
       </div>
 
-      {/* Shop Items Grid */}
-      <div className="bg-zinc-800 rounded-xl p-4 border border-zinc-700">
-        <h3 className="font-semibold mb-4 flex items-center gap-2">
+      {/* Shop Items */}
+      <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
+        <h3 className="font-semibold mb-3 flex items-center gap-2">
           <Flame className="w-5 h-5 text-orange-500" />
           Indulgences
         </h3>
-        <div className="grid grid-cols-2 gap-3 max-h-96 overflow-y-auto">
+        <div className="space-y-2 max-h-96 overflow-y-auto">
           {JUNK_FOODS.map(item => (
-            <div 
-              key={item.name} 
-              className="bg-zinc-900 rounded-lg p-3 border border-zinc-700 hover:border-zinc-600 transition-colors cursor-pointer"
-              onClick={() => setSelectedItem(item)}
-            >
-              <div className="text-center mb-2">
-                <div className="text-4xl mb-1">{item.image}</div>
-                <div className="font-medium text-sm mb-1">{item.name}</div>
-                <div className="text-xs text-zinc-500">{item.calories} cal</div>
+            <div key={item.name} className="bg-zinc-900 p-3 rounded-lg flex items-center justify-between">
+              <div className="flex-1">
+                <div className="font-medium text-sm">{item.name}</div>
+                <div className="text-xs text-zinc-500">{item.calories} cal • {item.type}</div>
               </div>
-              
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
                 <span className="text-sm font-bold text-purple-400">{item.xp} XP</span>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addToCart(item);
-                  }}
-                  className="px-2 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs transition-colors"
+                  onClick={() => addToCart(item)}
+                  className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs transition-colors"
                 >
                   Add
                 </button>
               </div>
-              
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedItem(item);
-                }}
-                className="w-full mt-2 flex items-center justify-center gap-1 py-1 bg-zinc-800 hover:bg-zinc-700 rounded text-xs transition-colors"
-              >
-                <Info className="w-3 h-3" />
-                Details
-              </button>
             </div>
           ))}
         </div>
@@ -1102,7 +878,7 @@ function XPShop({ cart, setCart, userData, setUserData, purchaseHistory, setPurc
 
       {/* Cart */}
       {cart.length > 0 && (
-        <div className="bg-zinc-800 rounded-xl p-4 border border-zinc-700">
+        <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
           <h3 className="font-semibold mb-3 flex items-center gap-2">
             <ShoppingCart className="w-5 h-5" />
             Cart ({cart.length})
@@ -1110,12 +886,8 @@ function XPShop({ cart, setCart, userData, setUserData, purchaseHistory, setPurc
           <div className="space-y-2 mb-4">
             {cart.map(item => (
               <div key={item.name} className="bg-zinc-900 p-3 rounded-lg">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="text-2xl">{item.image}</div>
-                  <div className="flex-1">
-                    <div className="font-medium text-sm">{item.name}</div>
-                    <div className="text-xs text-zinc-500">{item.xp} XP each</div>
-                  </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-sm">{item.name}</span>
                   <button
                     onClick={() => removeFromCart(item.name)}
                     className="text-red-400 text-xs hover:text-red-300"
@@ -1170,228 +942,6 @@ function XPShop({ cart, setCart, userData, setUserData, purchaseHistory, setPurc
     </div>
   );
 }
-
-//export default XPShop;
-// function XPShop({ cart, setCart, userData, setUserData, purchaseHistory, setPurchaseHistory }) {
-//   const [view, setView] = useState('shop');
-
-//   const addToCart = (item) => {
-//     const existing = cart.find(i => i.name === item.name);
-//     if (existing) {
-//       setCart(cart.map(i => i.name === item.name ? { ...i, quantity: i.quantity + 1 } : i));
-//     } else {
-//       setCart([...cart, { ...item, quantity: 1 }]);
-//     }
-//   };
-
-//   const removeFromCart = (itemName) => {
-//     setCart(cart.filter(i => i.name !== itemName));
-//   };
-
-//   const updateQuantity = (itemName, delta) => {
-//     setCart(cart.map(i => {
-//       if (i.name === itemName) {
-//         const newQty = Math.max(0, i.quantity + delta);
-//         return newQty === 0 ? null : { ...i, quantity: newQty };
-//       }
-//       return i;
-//     }).filter(Boolean));
-//   };
-
-//   const totalXP = cart.reduce((sum, item) => sum + (item.xp * item.quantity), 0);
-
-//   const checkout = () => {
-//     if (cart.length === 0) return;
-    
-//     if (totalXP > userData.currentXP) {
-//       alert("Not enough XP! Keep grinding.");
-//       return;
-//     }
-
-//     const purchase = {
-//       items: [...cart],
-//       totalXP,
-//       date: new Date().toISOString(),
-//       timestamp: Date.now()
-//     };
-
-//     setPurchaseHistory([purchase, ...purchaseHistory]);
-//     setUserData(prev => ({
-//       ...prev,
-//       currentXP: prev.currentXP - totalXP,
-//       totalXPSpent: prev.totalXPSpent + totalXP
-//     }));
-
-//     setCart([]);
-//     setView('history');
-
-//     alert(`Purchase complete! You spent ${totalXP} XP. That was ${Math.ceil(totalXP / 180)} days of workouts. Worth it?`);
-//   };
-
-//   if (view === 'history') {
-//     return (
-//       <div className="p-4 space-y-4">
-//         <div className="flex gap-2">
-//           <button
-//             onClick={() => setView('shop')}
-//             className="flex-1 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
-//           >
-//             Shop
-//           </button>
-//           <button
-//             onClick={() => setView('history')}
-//             className="flex-1 py-2 bg-purple-600 rounded-lg text-sm"
-//           >
-//             History
-//           </button>
-//         </div>
-
-//         <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-//           <h3 className="font-semibold mb-3">Purchase History</h3>
-//           {purchaseHistory.length === 0 ? (
-//             <p className="text-sm text-zinc-500 text-center py-4">No purchases yet. Stay disciplined.</p>
-//           ) : (
-//             <div className="space-y-3">
-//               {purchaseHistory.map((purchase, i) => (
-//                 <div key={i} className="bg-zinc-900 p-3 rounded-lg">
-//                   <div className="flex justify-between items-start mb-2">
-//                     <span className="text-xs text-zinc-500">
-//                       {new Date(purchase.date).toLocaleDateString()} • {new Date(purchase.date).toLocaleTimeString()}
-//                     </span>
-//                     <span className="text-sm font-bold text-red-400">-{purchase.totalXP} XP</span>
-//                   </div>
-//                   <div className="space-y-1">
-//                     {purchase.items.map((item, j) => (
-//                       <div key={j} className="text-sm text-zinc-300">
-//                         {item.name} ×{item.quantity}
-//                       </div>
-//                     ))}
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="p-4 space-y-4">
-//       <div className="flex gap-2">
-//         <button
-//           onClick={() => setView('shop')}
-//           className="flex-1 py-2 bg-purple-600 rounded-lg text-sm"
-//         >
-//           Shop
-//         </button>
-//         <button
-//           onClick={() => setView('history')}
-//           className="flex-1 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-sm transition-colors"
-//         >
-//           History
-//         </button>
-//       </div>
-
-//       {/* Balance Display */}
-//       <div className="bg-gradient-to-r from-purple-900 to-purple-800 rounded-lg p-4 border border-purple-700">
-//         <div className="text-sm text-purple-200 mb-1">Your Balance</div>
-//         <div className="text-3xl font-bold">{userData.currentXP} XP</div>
-//       </div>
-
-//       {/* Shop Items */}
-//       <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-//         <h3 className="font-semibold mb-3 flex items-center gap-2">
-//           <Flame className="w-5 h-5 text-orange-500" />
-//           Indulgences
-//         </h3>
-//         <div className="space-y-2 max-h-96 overflow-y-auto">
-//           {JUNK_FOODS.map(item => (
-//             <div key={item.name} className="bg-zinc-900 p-3 rounded-lg flex items-center justify-between">
-//               <div className="flex-1">
-//                 <div className="font-medium text-sm">{item.name}</div>
-//                 <div className="text-xs text-zinc-500">{item.calories} cal • {item.type}</div>
-//               </div>
-//               <div className="flex items-center gap-3">
-//                 <span className="text-sm font-bold text-purple-400">{item.xp} XP</span>
-//                 <button
-//                   onClick={() => addToCart(item)}
-//                   className="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-xs transition-colors"
-//                 >
-//                   Add
-//                 </button>
-//               </div>
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Cart */}
-//       {cart.length > 0 && (
-//         <div className="bg-zinc-800 rounded-lg p-4 border border-zinc-700">
-//           <h3 className="font-semibold mb-3 flex items-center gap-2">
-//             <ShoppingCart className="w-5 h-5" />
-//             Cart ({cart.length})
-//           </h3>
-//           <div className="space-y-2 mb-4">
-//             {cart.map(item => (
-//               <div key={item.name} className="bg-zinc-900 p-3 rounded-lg">
-//                 <div className="flex items-center justify-between mb-2">
-//                   <span className="font-medium text-sm">{item.name}</span>
-//                   <button
-//                     onClick={() => removeFromCart(item.name)}
-//                     className="text-red-400 text-xs hover:text-red-300"
-//                   >
-//                     Remove
-//                   </button>
-//                 </div>
-//                 <div className="flex items-center justify-between">
-//                   <div className="flex items-center gap-2">
-//                     <button
-//                       onClick={() => updateQuantity(item.name, -1)}
-//                       className="w-6 h-6 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
-//                     >
-//                       -
-//                     </button>
-//                     <span className="text-sm w-8 text-center">{item.quantity}</span>
-//                     <button
-//                       onClick={() => updateQuantity(item.name, 1)}
-//                       className="w-6 h-6 bg-zinc-700 hover:bg-zinc-600 rounded text-sm"
-//                     >
-//                       +
-//                     </button>
-//                   </div>
-//                   <span className="text-sm text-purple-400">{item.xp * item.quantity} XP</span>
-//                 </div>
-//               </div>
-//             ))}
-//           </div>
-
-//           <div className="border-t border-zinc-700 pt-3">
-//             <div className="flex justify-between items-center mb-3">
-//               <span className="font-semibold">Total</span>
-//               <span className="text-xl font-bold text-purple-400">{totalXP} XP</span>
-//             </div>
-//             <div className="text-xs text-zinc-500 mb-3 text-center">
-//               That's {Math.ceil(totalXP / 180)} days of workouts. Sure?
-//             </div>
-//             <button
-//               onClick={checkout}
-//               disabled={totalXP > userData.currentXP}
-//               className={`w-full py-3 rounded-lg font-semibold transition-colors ${
-//                 totalXP > userData.currentXP
-//                   ? 'bg-zinc-700 text-zinc-500 cursor-not-allowed'
-//                   : 'bg-green-600 hover:bg-green-700'
-//               }`}
-//             >
-//               {totalXP > userData.currentXP ? 'Not Enough XP' : 'Complete Purchase'}
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
 
 function StatsView({ userData, todayData, purchaseHistory }) {
   const totalEarned = userData.totalXPEarned;
