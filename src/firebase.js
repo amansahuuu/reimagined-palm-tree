@@ -1,16 +1,24 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  getDoc, 
+  collection, 
+  addDoc, 
+  query, 
+  orderBy, 
+  getDocs,
+  updateDoc 
+} from 'firebase/firestore';
+import { 
+  getStorage, 
+  ref, 
+  uploadBytes, 
+  getDownloadURL 
+} from 'firebase/storage';
 
-// PASTE YOUR CONFIG HERE (from step 3.3)
-// Import the functions you need from the SDKs you need
-
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// REPLACE WITH YOUR CONFIG FROM FIREBASE CONSOLE
 const firebaseConfig = {
   apiKey: "AIzaSyBLYcPr8GZHAn8pFfZyuXltHyKdejxIsbI",
   authDomain: "dailychores-1d580.firebaseapp.com",
@@ -21,30 +29,25 @@ const firebaseConfig = {
   measurementId: "G-C5XSJLJJHT"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// USER ID (for now, hardcode this - later we'll add auth)
-const USER_ID = "user_001"; // Change this to your name or whatever
+const USER_ID = "user123";
 
-// ==================== DATABASE FUNCTIONS ====================
+// ==================== USER DATA ====================
 
-// Save user data
 export async function saveUserData(userData) {
   try {
     await setDoc(doc(db, 'users', USER_ID), {
       ...userData,
       lastUpdated: new Date().toISOString()
     });
-    console.log('User data saved!');
   } catch (error) {
     console.error('Error saving user data:', error);
   }
 }
 
-// Load user data
 export async function loadUserData() {
   try {
     const docRef = doc(db, 'users', USER_ID);
@@ -53,7 +56,6 @@ export async function loadUserData() {
     if (docSnap.exists()) {
       return docSnap.data();
     } else {
-      // Return default data if user doesn't exist yet
       return {
         level: 1,
         currentXP: 0,
@@ -69,9 +71,10 @@ export async function loadUserData() {
   }
 }
 
-// Save today's data
+// ==================== DAILY LOGS ====================
+
 export async function saveTodayData(todayData) {
-  const today = new Date().toISOString().split('T')[0]; // Format: 2025-10-29
+  const today = new Date().toISOString().split('T')[0];
   
   try {
     await setDoc(doc(db, 'users', USER_ID, 'dailyLogs', today), {
@@ -79,13 +82,11 @@ export async function saveTodayData(todayData) {
       date: today,
       timestamp: new Date().toISOString()
     });
-    console.log('Today data saved!');
   } catch (error) {
     console.error('Error saving today data:', error);
   }
 }
 
-// Load today's data
 export async function loadTodayData() {
   const today = new Date().toISOString().split('T')[0];
   
@@ -97,7 +98,7 @@ export async function loadTodayData() {
       return docSnap.data();
     } else {
       return {
-        workout: { completed: false, type: 'push', rounds: 0, exercises: [] },
+        workout: { completed: false, day: 1, exercises: [], photoURL: null },
         nutrition: { calories: 0, protein: 0, carbs: 0, fat: 0, meals: [] },
         habits: {},
         waterIntake: 0
@@ -109,29 +110,141 @@ export async function loadTodayData() {
   }
 }
 
-// Save purchase
+// ==================== PURCHASE HISTORY ====================
+
 export async function savePurchase(purchase) {
   try {
     await addDoc(collection(db, 'users', USER_ID, 'purchases'), {
       ...purchase,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      userId: USER_ID
     });
-    console.log('Purchase saved!');
+    console.log('Purchase saved to Firebase!');
   } catch (error) {
     console.error('Error saving purchase:', error);
   }
 }
 
-// Upload photo (for penalty proofs)
-export async function uploadPhoto(file) {
+export async function loadPurchaseHistory() {
   try {
-    const storageRef = ref(storage, `penalties/${USER_ID}/${Date.now()}.jpg`);
+    const q = query(
+      collection(db, 'users', USER_ID, 'purchases'),
+      orderBy('timestamp', 'desc')
+    );
+    const querySnapshot = await getDocs(q);
+    
+    const purchases = [];
+    querySnapshot.forEach((doc) => {
+      purchases.push({ id: doc.id, ...doc.data() });
+    });
+    
+    console.log('Loaded purchase history:', purchases);
+    return purchases;
+  } catch (error) {
+    console.error('Error loading purchase history:', error);
+    return [];
+  }
+}
+
+export async function getLastPurchaseDate(productName) {
+  try {
+    const q = query(
+      collection(db, 'users', USER_ID, 'purchases'),
+      orderBy('timestamp', 'desc')
+    );
+    const querySnapshot = await getDocs(q);
+    
+    for (const doc of querySnapshot.docs) {
+      const purchase = doc.data();
+      const hasProduct = purchase.items.some(item => item.name === productName);
+      if (hasProduct) {
+        return purchase.timestamp;
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting last purchase:', error);
+    return null;
+  }
+}
+
+// ==================== IMAGE UPLOAD ====================
+
+export async function uploadWorkoutPhoto(file) {
+  try {
+    const timestamp = Date.now();
+    const storageRef = ref(storage, `workouts/${USER_ID}/${timestamp}.jpg`);
     await uploadBytes(storageRef, file);
     const url = await getDownloadURL(storageRef);
+    console.log('Workout photo uploaded:', url);
     return url;
   } catch (error) {
-    console.error('Error uploading photo:', error);
+    console.error('Error uploading workout photo:', error);
     return null;
+  }
+}
+
+export async function uploadPurchasePhoto(file) {
+  try {
+    const timestamp = Date.now();
+    const storageRef = ref(storage, `purchases/${USER_ID}/${timestamp}.jpg`);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+    console.log('Purchase photo uploaded:', url);
+    return url;
+  } catch (error) {
+    console.error('Error uploading purchase photo:', error);
+    return null;
+  }
+}
+
+export async function uploadPenaltyPhoto(file) {
+  try {
+    const timestamp = Date.now();
+    const storageRef = ref(storage, `penalties/${USER_ID}/${timestamp}.jpg`);
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+    console.log('Penalty photo uploaded:', url);
+    return url;
+  } catch (error) {
+    console.error('Error uploading penalty photo:', error);
+    return null;
+  }
+}
+
+// ==================== WORKOUT HISTORY ====================
+
+export async function saveWorkoutCompletion(workoutData) {
+  try {
+    await addDoc(collection(db, 'users', USER_ID, 'workoutHistory'), {
+      ...workoutData,
+      timestamp: new Date().toISOString(),
+      userId: USER_ID
+    });
+    console.log('Workout history saved!');
+  } catch (error) {
+    console.error('Error saving workout history:', error);
+  }
+}
+
+export async function loadWorkoutHistory() {
+  try {
+    const q = query(
+      collection(db, 'users', USER_ID, 'workoutHistory'),
+      orderBy('timestamp', 'desc')
+    );
+    const querySnapshot = await getDocs(q);
+    
+    const workouts = [];
+    querySnapshot.forEach((doc) => {
+      workouts.push({ id: doc.id, ...doc.data() });
+    });
+    
+    console.log('Loaded workout history:', workouts.length, 'workouts');
+    return workouts;
+  } catch (error) {
+    console.error('Error loading workout history:', error);
+    return [];
   }
 }
 
